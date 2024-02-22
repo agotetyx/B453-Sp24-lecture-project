@@ -17,8 +17,10 @@ public class gameManager : MonoBehaviour
     public GameObject red_Billion;
     private bool isPlaced;
 
-    List <GameObject> green_flags_array = new List<GameObject>();
-    List<GameObject> red_flags_array = new List<GameObject>();
+    private List <GameObject> green_flags_array = new List<GameObject>();
+    private List<GameObject> red_flags_array = new List<GameObject>();
+
+    BaseScript baseScript;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,10 +31,17 @@ public class gameManager : MonoBehaviour
     void Update()
     {
         flagSpawn();
-        //MoveBillions(red_Billion);
-        //MoveBillions(green_Billion);
 
+        /*foreach (GameObject billion in baseScript.red_billions_array)
+        {
+            MoveBillions(billion);
+        }
+        foreach (GameObject billion in baseScript.green_billions_array)
+        {
+            MoveBillions(billion);
+        }*/
         
+
     }
 
     void flagSpawn()
@@ -94,10 +103,13 @@ public class gameManager : MonoBehaviour
             if (flag.tag == "green-flag")
         {
             green_flags_array.Add(flag);
+
+            print("green array" + green_flags_array.Count);
         }
         if (flag.tag == "red-flag")
         {
             red_flags_array.Add(flag);
+            print("red array" + red_flags_array.Count);
         }
 
         isPlaced = true;
@@ -131,25 +143,33 @@ public class gameManager : MonoBehaviour
         }
         }
 
-    void MoveBillions(GameObject prefab)
+    void MoveBillions(GameObject flag)
     {
         if (isPlaced)
         {
-            print("is placed" + isPlaced);
-            
-            if (prefab.tag == "green")
+            //print("is placed" + isPlaced);
+
+            if (flag.CompareTag("green-flag"))
             {
-                print(prefab.tag + " flag is detected");
+                print(flag.tag + " is detected");
                 //GameObject [] green_flags_array = GameObject.FindGameObjectsWithTag("green");
-                prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, green_flags_array[0].transform.position, 1 * Time.deltaTime);
-            
+                //prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, green_flags_array[0].transform.position, 1 * Time.deltaTime);
+                Vector3 direction = (green_flags_array[0].transform.position - flag.transform.position).normalized;
+                float speed = 1.0f; // Adjust this speed as needed
+                flag.transform.Translate(direction * speed * Time.deltaTime);
+
             }
 
-            if (prefab.tag == "red")
+            if (flag.CompareTag("red-flag"))
             {
-                print(prefab.tag + " flag is detected");
+                print(flag.tag + " is detected");
                 //GameObject[] red_flags_array = GameObject.FindGameObjectsWithTag("red");
-                prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, red_flags_array[0].transform.position, 1 * Time.deltaTime);
+                //prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, red_flags_array[0].transform.position, 1 * Time.deltaTime);
+                Vector3 direction = (red_flags_array[0].transform.position - flag.transform.position).normalized;
+                float speed = 1.0f; // Adjust this speed as needed
+                flag.transform.Translate(direction * speed * Time.deltaTime);
+
+
             }
 
 

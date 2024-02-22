@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7274475502800927352}
   m_Layer: 0
   m_Name: green_flag
-  m_TagString: green
+  m_TagString: green-flag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
