@@ -21,9 +21,33 @@ public class gameManager : MonoBehaviour
     private List<GameObject> red_flags_array = new List<GameObject>();
 
     BaseScript baseScript;
+    BaseScript green_baseScript;
+    BaseScript red_baseScript;
+
+    public GameObject red_base;
+    public GameObject green_base;
     // Start is called before the first frame update
     void Start()
     {
+        baseScript = GetComponent<BaseScript>();
+
+
+        
+
+        if (red_base != null)
+        {
+            // Get the ScriptA component attached to GameObjectA
+            red_baseScript = red_base.GetComponent<BaseScript>();
+
+        }
+
+    
+        if (green_base != null)
+        {
+            // Get the ScriptA component attached to GameObjectA
+            green_baseScript = green_base.GetComponent<BaseScript>();
+
+        }
 
     }
 
@@ -32,46 +56,38 @@ public class gameManager : MonoBehaviour
     {
         flagSpawn();
 
-        /*foreach (GameObject billion in baseScript.red_billions_array)
-        {
+        
+            foreach (GameObject billion in red_baseScript.billions_array)
+            {
+            print("move bilions for: " + billion.gameObject.tag);
+                MoveBillions(billion);
+            }
+        
+
+       
+            foreach (GameObject billion in green_baseScript.billions_array)
+            {
+            print("move bilions for green");
             MoveBillions(billion);
-        }
-        foreach (GameObject billion in baseScript.green_billions_array)
-        {
-            MoveBillions(billion);
-        }*/
+            }
+        
         
 
     }
 
     void flagSpawn()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && green_flags_array.Count <= 1)
         {
             SpawnPrefab(green_flag_prefab);
-            green_count++;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            // Check if the ray hits any collider in the scene
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Check if the collider hit belongs to the object we want to detect clicks on
-                foreach (GameObject flag in green_flags_array)
-                {
-                    if (hit.collider.gameObject == green_flag_prefab)
-                    {
-                        print("green clicked");
-                        dragFlag(green_flag_prefab);
-                    }
-                }
-               
-            }
+            
+            
         }
         // Check if the right mouse button is clicked
-        else if (Input.GetMouseButtonDown(1))
+        else if (Input.GetMouseButtonDown(1) && red_flags_array.Count <= 1)
         {// Check if the ray hits any collider in the scene
             SpawnPrefab(red_flag_prefab);
-            green_count++;
+            
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
@@ -100,19 +116,21 @@ public class gameManager : MonoBehaviour
             // Instantiate the prefab at the mouse position
             GameObject flag = Instantiate(prefab, mousePosition, Quaternion.identity);
 
-            if (flag.tag == "green-flag")
-        {
+            if (flag.tag == "green-flag" && green_flags_array.Count <= 1)
+            {
             green_flags_array.Add(flag);
-
-            print("green array" + green_flags_array.Count);
-        }
-        if (flag.tag == "red-flag")
-        {
+            green_count++;
+            print("green flag array" + green_flags_array.Count);
+            }
+            if (flag.tag == "red-flag" && red_flags_array.Count <= 1)
+            {
             red_flags_array.Add(flag);
-            print("red array" + red_flags_array.Count);
-        }
+            print("red flag array" + red_flags_array.Count);
+            red_count++;
+            }
 
         isPlaced = true;
+        //print(isPlaced);
         }
 
         void dragFlag(GameObject prefab)
@@ -132,9 +150,27 @@ public class gameManager : MonoBehaviour
 
             if (Input.GetMouseButton(0))
             {
-                drag_endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                lineRenderer.SetPosition(1, drag_endPos);
+                
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            // Check if the ray hits any collider in the scene
+            if (Physics.Raycast(ray, out hit))
+            {
+                // Check if the collider hit belongs to the object we want to detect clicks on
+                foreach (GameObject flag in green_flags_array)
+                {
+                    if (hit.collider.gameObject == green_flag_prefab)
+                    {
+                        print("green clicked");
+                        drag_endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        lineRenderer.SetPosition(1, drag_endPos);
+                    }
+                }
+
             }
+
+        }
 
             if (Input.GetMouseButtonUp(0))
             {
@@ -143,32 +179,78 @@ public class gameManager : MonoBehaviour
         }
         }
 
-    void MoveBillions(GameObject flag)
+    void MoveBillions(GameObject billion)
     {
+        Rigidbody2D rb = billion.GetComponent<Rigidbody2D>();
         if (isPlaced)
         {
-            //print("is placed" + isPlaced);
+            print("is placed" + isPlaced);
+            float green_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
+            GameObject green_nearestFlag = null;
 
-            if (flag.CompareTag("green-flag"))
+            float red_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
+            GameObject red_nearestFlag = null;
+
+            foreach (GameObject flag in green_flags_array)
             {
-                print(flag.tag + " is detected");
-                //GameObject [] green_flags_array = GameObject.FindGameObjectsWithTag("green");
-                //prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, green_flags_array[0].transform.position, 1 * Time.deltaTime);
-                Vector3 direction = (green_flags_array[0].transform.position - flag.transform.position).normalized;
-                float speed = 1.0f; // Adjust this speed as needed
-                flag.transform.Translate(direction * speed * Time.deltaTime);
+                if (billion.tag == "green")
+                {
+                    print(billion.tag + " flag is detected");
+                    float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
+                    if (distanceToFlag < green_shortestDistance) 
+                    {
+                        green_shortestDistance = distanceToFlag; 
+                        green_nearestFlag = flag;
+                        Vector3 direction = (green_nearestFlag.transform.position - billion.transform.position).normalized;
+                        float speed = 5.0f; // Adjust this speed as needed
+                        billion.transform.Translate(direction * speed * Time.deltaTime);
+                        //billion.transform.LookAt(green_nearestFlag.transform);
 
+                        /* float angle = Mathf.Atan2(green_nearestFlag.transform.position.y, green_nearestFlag.transform.position.x) * Mathf.Rad2Deg;
+
+                         // Set the rotation towards the target
+                         billion.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);*/
+
+                        Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
+                         billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
+                       /* float cross = Vector3.Cross(direction, billion.transform.right).z;
+                        rb.angularVelocity = 20 * cross;
+                        rb.velocity = transform.right * speed;*/
+
+                    }
+
+                }
             }
-
-            if (flag.CompareTag("red-flag"))
+            foreach (GameObject flag in red_flags_array)
             {
-                print(flag.tag + " is detected");
-                //GameObject[] red_flags_array = GameObject.FindGameObjectsWithTag("red");
-                //prefab.transform.position += Vector3.MoveTowards(prefab.transform.position, red_flags_array[0].transform.position, 1 * Time.deltaTime);
-                Vector3 direction = (red_flags_array[0].transform.position - flag.transform.position).normalized;
-                float speed = 1.0f; // Adjust this speed as needed
-                flag.transform.Translate(direction * speed * Time.deltaTime);
+                if (billion.tag == "red")
+                {
+                    print(billion.tag + " flag is detected");
+                    float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
+                    if (distanceToFlag < red_shortestDistance)
+                    {
+                        red_shortestDistance = distanceToFlag;
+                        red_nearestFlag = flag;
+                        Vector3 direction = (red_nearestFlag.transform.position - billion.transform.position).normalized;
+                        float speed = 5.0f; // Adjust this speed as needed
+                        billion.transform.Translate(direction * speed * Time.deltaTime);
+                       /* float cross = Vector3.Cross(direction, billion.transform.right).z;
+                        rb.angularVelocity = 20 * cross;
+                        rb.velocity = transform.right * speed;*/
 
+                        Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
+                        billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
+                        //
+                        //billion.transform.LookAt(red_nearestFlag.transform);
+
+
+                        /* float angle = Mathf.Atan2(red_nearestFlag.transform.position.y, red_nearestFlag.transform.position.x) * Mathf.Rad2Deg;
+
+                         // Set the rotation towards the target
+                         billion.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);*/
+
+                    }
+                }
 
             }
 
