@@ -10,6 +10,8 @@ public class BaseScript : MonoBehaviour
     /*public List<GameObject> green_billions_array = new List<GameObject>();
     public List<GameObject> red_billions_array = new List<GameObject>();*/
     public List<GameObject> billions_array = new List<GameObject>();
+
+    public Transform spawnPoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +27,7 @@ public class BaseScript : MonoBehaviour
     public void spawnBillion()
     {
         //print("billion spawned");
-        GameObject billion = Instantiate(Billion, transform.position, Quaternion.identity);
+        GameObject billion = Instantiate(Billion, spawnPoint.transform.position, Quaternion.identity);
         Invoke("spawnBillion", timer);
         billions_array.Add(billion);
         /*if (billion.tag == "green")

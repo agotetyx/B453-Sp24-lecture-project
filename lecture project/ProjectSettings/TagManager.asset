@@ -8,6 +8,8 @@ TagManager:
   - red
   - green-flag
   - red-flag
+  - green-bullet
+  - red-bullet
   layers:
   - Default
   - TransparentFX

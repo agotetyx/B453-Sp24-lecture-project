@@ -15,7 +15,7 @@ public class gameManager : MonoBehaviour
 
     public GameObject green_Billion;
     public GameObject red_Billion;
-    private bool isPlaced;
+    public bool isPlaced;
 
     private List <GameObject> green_flags_array = new List<GameObject>();
     private List<GameObject> red_flags_array = new List<GameObject>();
@@ -26,13 +26,15 @@ public class gameManager : MonoBehaviour
 
     public GameObject red_base;
     public GameObject green_base;
+
+    
     // Start is called before the first frame update
     void Start()
     {
         baseScript = GetComponent<BaseScript>();
 
 
-        
+       
 
         if (red_base != null)
         {
@@ -59,7 +61,7 @@ public class gameManager : MonoBehaviour
         
             foreach (GameObject billion in red_baseScript.billions_array)
             {
-            print("move bilions for: " + billion.gameObject.tag);
+            //print("move bilions for: " + billion.gameObject.tag);
                 MoveBillions(billion);
             }
         
@@ -67,7 +69,7 @@ public class gameManager : MonoBehaviour
        
             foreach (GameObject billion in green_baseScript.billions_array)
             {
-            print("move bilions for green");
+            //print("move bilions for green");
             MoveBillions(billion);
             }
         
@@ -120,12 +122,12 @@ public class gameManager : MonoBehaviour
             {
             green_flags_array.Add(flag);
             green_count++;
-            print("green flag array" + green_flags_array.Count);
+            //print("green flag array" + green_flags_array.Count);
             }
             if (flag.tag == "red-flag" && red_flags_array.Count <= 1)
             {
             red_flags_array.Add(flag);
-            print("red flag array" + red_flags_array.Count);
+            //print("red flag array" + red_flags_array.Count);
             red_count++;
             }
 
@@ -184,7 +186,7 @@ public class gameManager : MonoBehaviour
         Rigidbody2D rb = billion.GetComponent<Rigidbody2D>();
         if (isPlaced)
         {
-            print("is placed" + isPlaced);
+            //print("is placed" + isPlaced);
             float green_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
             GameObject green_nearestFlag = null;
 
@@ -195,7 +197,7 @@ public class gameManager : MonoBehaviour
             {
                 if (billion.tag == "green")
                 {
-                    print(billion.tag + " flag is detected");
+                    //print(billion.tag + " flag is detected");
                     float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
                     if (distanceToFlag < green_shortestDistance) 
                     {
@@ -225,7 +227,7 @@ public class gameManager : MonoBehaviour
             {
                 if (billion.tag == "red")
                 {
-                    print(billion.tag + " flag is detected");
+                    //print(billion.tag + " flag is detected");
                     float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
                     if (distanceToFlag < red_shortestDistance)
                     {
