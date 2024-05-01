@@ -12,6 +12,14 @@ TagManager:
   - red-bullet
   - red-base-bullet
   - green-base-bullet
+  - blue
+  - blue-flag
+  - blue-bullet
+  - blue-base-bullet
+  - yellow
+  - yellow-flag
+  - yellow-bullet
+  - yellow-base-bullet
   layers:
   - Default
   - TransparentFX

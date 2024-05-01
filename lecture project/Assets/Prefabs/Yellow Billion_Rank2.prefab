@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 4212064814105852019}
   m_Layer: 0
   m_Name: Yellow Billion_Rank2
-  m_TagString: green
+  m_TagString: yellow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

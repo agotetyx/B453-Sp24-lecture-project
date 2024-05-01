@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 299221807066675651}
   m_Layer: 0
   m_Name: Blue Base Bullet
-  m_TagString: green-base-bullet
+  m_TagString: blue-base-bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

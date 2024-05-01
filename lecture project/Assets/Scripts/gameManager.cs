@@ -6,8 +6,13 @@ public class gameManager : MonoBehaviour
 {
     public GameObject red_flag_prefab;
     public GameObject green_flag_prefab;
+    public GameObject blue_flag_prefab;
+    public GameObject yellow_flag_prefab;
+
     private int red_count = 0;
     private int green_count = 0;
+    private int blue_count = 0;
+    private int yellow_count = 0;
 
     public LineRenderer lineRenderer;
     Vector3 drag_startPos;
@@ -15,17 +20,25 @@ public class gameManager : MonoBehaviour
 
     public GameObject green_Billion;
     public GameObject red_Billion;
+    public GameObject blue_Billion;
+    public GameObject yellow_Billion;
     public bool isPlaced;
 
     private List <GameObject> green_flags_array = new List<GameObject>();
     private List<GameObject> red_flags_array = new List<GameObject>();
-
+    private List<GameObject> blue_flags_array = new List<GameObject>();
+    private List<GameObject> yellow_flags_array = new List<GameObject>();
     BaseScript baseScript;
+
     BaseScript green_baseScript;
     BaseScript red_baseScript;
+    BaseScript blue_baseScript;
+    BaseScript yellow_baseScript;
 
     public GameObject red_base;
     public GameObject green_base;
+    public GameObject blue_base;
+    public GameObject yellow_base;
 
     public bool isDragging;
 
@@ -54,6 +67,22 @@ public class gameManager : MonoBehaviour
 
         }
 
+
+        if (blue_base != null)
+        {
+            // Get the ScriptA component attached to GameObjectA
+            blue_baseScript = blue_base.GetComponent<BaseScript>();
+
+        }
+
+
+        if (yellow_base != null)
+        {
+            // Get the ScriptA component attached to GameObjectA
+            yellow_baseScript = yellow_base.GetComponent<BaseScript>();
+
+        }
+
     }
 
     // Update is called once per frame
@@ -77,7 +106,23 @@ public class gameManager : MonoBehaviour
             //print("move bilions for green");
             MoveBillions(billion);
             }
-        
+
+        foreach (GameObject billion in blue_baseScript.billions_array)
+        {
+            //print("move bilions for green");
+            MoveBillions(billion);
+        }
+
+
+        foreach (GameObject billion in yellow_baseScript.billions_array)
+        {
+            //print("move bilions for green");
+            MoveBillions(billion);
+        }
+
+
+
+
         if (isDragging)
         {
             dragFlag(draggedFlag);
@@ -100,6 +145,19 @@ public class gameManager : MonoBehaviour
            
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1) && blue_flags_array.Count <= 1)
+        {
+            SpawnPrefab(blue_flag_prefab);
+
+
+        }
+        // Check if the right mouse button is clicked
+        else if (Input.GetKeyDown(KeyCode.Alpha2) && yellow_flags_array.Count <= 1)
+        {// Check if the ray hits any collider in the scene
+            SpawnPrefab(yellow_flag_prefab);
+
+        }
+
 
     }
     void SpawnPrefab(GameObject prefab)
@@ -112,7 +170,7 @@ public class gameManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             //print("ray shoot");
-            if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag")
+            if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag"|| hit.collider.gameObject.tag == "blue-flag" || hit.collider.gameObject.tag == "yellow-flag")
             {
                 return;
 
@@ -138,6 +196,20 @@ public class gameManager : MonoBehaviour
                 //print("red flag array" + red_flags_array.Count);
                 red_count++;
             }
+
+            if (flag.tag == "blue-flag" && blue_flags_array.Count <= 1)
+            {
+                blue_flags_array.Add(flag);
+                blue_count++;
+                //print("green flag array" + green_flags_array.Count);
+            }
+            if (flag.tag == "yellow-flag" && yellow_flags_array.Count <= 1)
+            {
+                yellow_flags_array.Add(flag);
+                //print("red flag array" + red_flags_array.Count);
+                yellow_count++;
+            }
+
 
             isPlaced = true;
             //print(isPlaced);
@@ -176,7 +248,7 @@ public class gameManager : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 print("ray shoot");
-                    if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag")
+                    if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag"|| hit.collider.gameObject.tag == "blue-flag" || hit.collider.gameObject.tag == "yellow-flag")
                     {
                     isDragging = true;
                     draggedFlag = hit.collider.gameObject;
@@ -202,11 +274,18 @@ public class gameManager : MonoBehaviour
             float red_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
             GameObject red_nearestFlag = null;
 
+            float blue_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
+            GameObject blue_nearestFlag = null;
+
+            float yellow_shortestDistance = Mathf.Infinity; // The shortest distance to an enemy
+            GameObject yellow_nearestFlag = null;
+
+
+
             foreach (GameObject flag in green_flags_array)
             {
                 if (billion.tag == "green")
                 {
-                    //print(billion.tag + " flag is detected");
                     float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
                     if (distanceToFlag < green_shortestDistance) 
                     {
@@ -215,19 +294,10 @@ public class gameManager : MonoBehaviour
                         Vector3 direction = (green_nearestFlag.transform.position - billion.transform.position).normalized;
                         float speed = 5.0f; // Adjust this speed as needed
                         billion.transform.Translate(direction * speed * Time.deltaTime);
-                        //billion.transform.LookAt(green_nearestFlag.transform);
-
-                        /* float angle = Mathf.Atan2(green_nearestFlag.transform.position.y, green_nearestFlag.transform.position.x) * Mathf.Rad2Deg;
-
-                         // Set the rotation towards the target
-                         billion.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);*/
 
                         Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
                          billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
-                       /* float cross = Vector3.Cross(direction, billion.transform.right).z;
-                        rb.angularVelocity = 20 * cross;
-                        rb.velocity = transform.right * speed;*/
-
+                       
                     }
 
                 }
@@ -236,8 +306,7 @@ public class gameManager : MonoBehaviour
             {
                 if (billion.tag == "red")
                 {
-                    //print(billion.tag + " flag is detected");
-                    float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
+                   float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
                     if (distanceToFlag < red_shortestDistance)
                     {
                         red_shortestDistance = distanceToFlag;
@@ -245,20 +314,50 @@ public class gameManager : MonoBehaviour
                         Vector3 direction = (red_nearestFlag.transform.position - billion.transform.position).normalized;
                         float speed = 5.0f; // Adjust this speed as needed
                         billion.transform.Translate(direction * speed * Time.deltaTime);
-                       /* float cross = Vector3.Cross(direction, billion.transform.right).z;
-                        rb.angularVelocity = 20 * cross;
-                        rb.velocity = transform.right * speed;*/
+                      
+                        Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
+                        billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
+                       
+                    }
+                }
+
+            }
+
+            foreach (GameObject flag in blue_flags_array)
+            {
+                if (billion.tag == "blue")
+                {
+                    float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
+                    if (distanceToFlag < blue_shortestDistance)
+                    {
+                        blue_shortestDistance = distanceToFlag;
+                        blue_nearestFlag = flag;
+                        Vector3 direction = (blue_nearestFlag.transform.position - billion.transform.position).normalized;
+                        float speed = 5.0f; // Adjust this speed as needed
+                        billion.transform.Translate(direction * speed * Time.deltaTime);
 
                         Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
                         billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
-                        //
-                        //billion.transform.LookAt(red_nearestFlag.transform);
 
+                    }
 
-                        /* float angle = Mathf.Atan2(red_nearestFlag.transform.position.y, red_nearestFlag.transform.position.x) * Mathf.Rad2Deg;
+                }
+            }
+            foreach (GameObject flag in yellow_flags_array)
+            {
+                if (billion.tag == "yellow")
+                {
+                    float distanceToFlag = Vector3.Distance(billion.transform.position, flag.transform.position);
+                    if (distanceToFlag < yellow_shortestDistance)
+                    {
+                        yellow_shortestDistance = distanceToFlag;
+                        yellow_nearestFlag = flag;
+                        Vector3 direction = (yellow_nearestFlag.transform.position - billion.transform.position).normalized;
+                        float speed = 5.0f; // Adjust this speed as needed
+                        billion.transform.Translate(direction * speed * Time.deltaTime);
 
-                         // Set the rotation towards the target
-                         billion.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);*/
+                        Quaternion rotation = Quaternion.LookRotation(flag.transform.position - billion.transform.position, transform.TransformDirection(Vector3.up));
+                        billion.transform.rotation = new Quaternion(0, 0, rotation.z, rotation.w);
 
                     }
                 }
