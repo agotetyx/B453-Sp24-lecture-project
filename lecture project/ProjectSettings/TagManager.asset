@@ -10,11 +10,13 @@ TagManager:
   - red-flag
   - green-bullet
   - red-bullet
+  - red-base-bullet
+  - green-base-bullet
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ground layer
   - Water
   - UI
   - 

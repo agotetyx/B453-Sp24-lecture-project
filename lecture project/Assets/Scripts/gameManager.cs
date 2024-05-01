@@ -9,7 +9,7 @@ public class gameManager : MonoBehaviour
     private int red_count = 0;
     private int green_count = 0;
 
-    private LineRenderer lineRenderer;
+    public LineRenderer lineRenderer;
     Vector3 drag_startPos;
     Vector3 drag_endPos;
 
@@ -27,6 +27,9 @@ public class gameManager : MonoBehaviour
     public GameObject red_base;
     public GameObject green_base;
 
+    public bool isDragging;
+
+    public GameObject draggedFlag;
     
     // Start is called before the first frame update
     void Start()
@@ -56,11 +59,13 @@ public class gameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //red_baseScript.billions_array = 
         flagSpawn();
-
+        flagClick();
         
             foreach (GameObject billion in red_baseScript.billions_array)
             {
+
             //print("move bilions for: " + billion.gameObject.tag);
                 MoveBillions(billion);
             }
@@ -73,13 +78,16 @@ public class gameManager : MonoBehaviour
             MoveBillions(billion);
             }
         
-        
+        if (isDragging)
+        {
+            dragFlag(draggedFlag);
+        }
 
     }
 
     void flagSpawn()
     {
-        if (Input.GetMouseButtonDown(0) && green_flags_array.Count <= 1)
+        if (Input.GetMouseButtonDown(0) && green_flags_array.Count <= 1 )
         {
             SpawnPrefab(green_flag_prefab);
             
@@ -89,27 +97,27 @@ public class gameManager : MonoBehaviour
         else if (Input.GetMouseButtonDown(1) && red_flags_array.Count <= 1)
         {// Check if the ray hits any collider in the scene
             SpawnPrefab(red_flag_prefab);
-            
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Check if the collider hit belongs to the object we want to detect clicks on
-                foreach (GameObject flag in red_flags_array)
-                {
-                    if (hit.collider.gameObject == red_flag_prefab)
-                    {
-                        print("red clicked");
-                        dragFlag(red_flag_prefab);
-                    }
-                }
-            }
+           
         }
 
 
     }
-        void SpawnPrefab(GameObject prefab)
+    void SpawnPrefab(GameObject prefab)
+    {
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        //RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero)
+        // Check if the ray hits any collider in the scene
+        if (Physics.Raycast(ray, out hit))
         {
+            //print("ray shoot");
+            if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag")
+            {
+                return;
+
+            }
+
 
             // Get the mouse position in the world
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -117,69 +125,70 @@ public class gameManager : MonoBehaviour
 
             // Instantiate the prefab at the mouse position
             GameObject flag = Instantiate(prefab, mousePosition, Quaternion.identity);
-
+            //flag.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
             if (flag.tag == "green-flag" && green_flags_array.Count <= 1)
             {
-            green_flags_array.Add(flag);
-            green_count++;
-            //print("green flag array" + green_flags_array.Count);
+                green_flags_array.Add(flag);
+                green_count++;
+                //print("green flag array" + green_flags_array.Count);
             }
             if (flag.tag == "red-flag" && red_flags_array.Count <= 1)
             {
-            red_flags_array.Add(flag);
-            //print("red flag array" + red_flags_array.Count);
-            red_count++;
+                red_flags_array.Add(flag);
+                //print("red flag array" + red_flags_array.Count);
+                red_count++;
             }
 
-        isPlaced = true;
-        //print(isPlaced);
+            isPlaced = true;
+            //print(isPlaced);
         }
-
+    }
         void dragFlag(GameObject prefab)
         {
-      
-                if (lineRenderer == null)
-                {
-                    lineRenderer = gameObject.AddComponent<LineRenderer>();
-                }
+        
                 lineRenderer.enabled = true;
                 lineRenderer.positionCount = 2;
                 drag_startPos = prefab.transform.position;
                 lineRenderer.SetPosition(0, drag_startPos);
+                drag_endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                drag_endPos.z = 0;
+                lineRenderer.SetPosition(1, drag_endPos);
                 lineRenderer.useWorldSpace = true;
 
-            
-
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButtonUp(0))
             {
-                
+                lineRenderer.enabled = false;
+                prefab.transform.position = new Vector3(drag_endPos.x, drag_endPos.y, 0);
+            isDragging = false;
+            
+        }
+        }
+
+    void flagClick()
+    {
+        if (Input.GetMouseButtonDown(0) && !isDragging)
+        {
+            
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             // Check if the ray hits any collider in the scene
             if (Physics.Raycast(ray, out hit))
             {
-                // Check if the collider hit belongs to the object we want to detect clicks on
-                foreach (GameObject flag in green_flags_array)
-                {
-                    if (hit.collider.gameObject == green_flag_prefab)
+                print("ray shoot");
+                    if (hit.collider.gameObject.tag == "green-flag" || hit.collider.gameObject.tag == "red-flag")
                     {
-                        print("green clicked");
-                        drag_endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        lineRenderer.SetPosition(1, drag_endPos);
+                    isDragging = true;
+                    draggedFlag = hit.collider.gameObject;
+                    print("flag clicked");
+                       
                     }
-                }
+                
 
             }
 
         }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                lineRenderer.enabled = false;
-                prefab.transform.position = Vector3.MoveTowards(transform.position, drag_endPos, 3 * Time.deltaTime);
-        }
-        }
+    }
 
     void MoveBillions(GameObject billion)
     {

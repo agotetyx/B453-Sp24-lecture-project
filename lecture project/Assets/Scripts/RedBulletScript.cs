@@ -27,11 +27,13 @@ public class RedBulletScript : MonoBehaviour
         if (timer > 5) { Destroy(gameObject); }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("green"))
             {
             Destroy(gameObject);
         }
     }
+
+    
 }

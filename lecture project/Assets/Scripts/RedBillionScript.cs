@@ -71,6 +71,16 @@ public class RedBillionScript : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+
+        if (other.gameObject.CompareTag("green-base-bullet"))
+        {
+            health -= 0;
+            changeColor();
+            if (health <= 0)
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 
     void changeColor()
